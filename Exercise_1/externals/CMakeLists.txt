@@ -132,10 +132,11 @@ if(NOT Boost_FOUND)
   elseif(MSVC)
     set(BOOST_TOOLSET "msvc")
     set(BOOST_LAYOUT versioned)
-    if(CMAKE_CL_64)
-      set(BOOST_TOOLSET_ADDRESSMODEL "address-model=64")
-    endif(CMAKE_CL_64)
   endif(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
+
+  if(CMAKE_CL_64)
+    set(BOOST_TOOLSET_ADDRESSMODEL "address-model=64")
+  endif(CMAKE_CL_64)
 
   ExternalProject_Add(boost
     URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.tar.bz2
