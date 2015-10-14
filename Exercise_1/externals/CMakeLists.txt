@@ -15,8 +15,8 @@ include(ExternalProject)
 
 # create output directories
 file(MAKE_DIRECTORY
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR})
@@ -32,9 +32,9 @@ endif(MSVC)
 add_custom_target(external_dependencies)
 
 add_custom_command(TARGET external_dependencies
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} ..
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} ..
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 ####################
@@ -44,23 +44,24 @@ find_package(GMock)
 find_package(GTest)
 if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
   ExternalProject_Add(googlemock
-    INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    URL http://googlemock.googlecode.com/files/gmock-1.7.0.zip
-    URL_MD5 073b984d8798ea1594f5e44d85b20d66
-    UPDATE_COMMAND ""
-    CMAKE_ARGS
-      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-      -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-      -Dgtest_force_shared_crt=${MSVC}
-      -DBUILD_SHARED_LIBS=OFF
-    INSTALL_COMMAND
-      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/gtest/include <INSTALL_DIR>/include &&
-      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
-      ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
-      ${CMAKE_COMMAND} -E copy <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
-      ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/  &&
-      ${CMAKE_COMMAND} -E copy <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
+          INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+          URL http://googlemock.googlecode.com/files/gmock-1.7.0.zip
+          URL_MD5 073b984d8798ea1594f5e44d85b20d66
+          UPDATE_COMMAND ""
+          CMAKE_ARGS
+            -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+            -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -Dgtest_force_shared_crt=${MSVC}
+            -Dgtest_disable_pthreads=${MINGW}
+            -DBUILD_SHARED_LIBS=OFF
+          INSTALL_COMMAND
+            ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/gtest/include <INSTALL_DIR>/include &&
+            ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
+            ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
+            ${CMAKE_COMMAND} -E copy <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
+            ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/  &&
+            ${CMAKE_COMMAND} -E copy <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
   )
 
   # override GMock_LIBRARY_DIRS such that only the ones from external are used
@@ -84,7 +85,7 @@ set(Boost_Components thread system regex date_time)
 find_package(Boost COMPONENTS ${Boost_Components})
 
 if(NOT Boost_FOUND)
-  
+
   string( REPLACE "." "_" Boost_Version_Underscore ${Boost_Version} )
 
   foreach(library ${Boost_Components})
@@ -93,21 +94,23 @@ if(NOT Boost_FOUND)
 
   string(TOLOWER ${CMAKE_BUILD_TYPE} BOOST_VARIANT)
   set(BOOST_THREADING multi)
-  if(USE_STATIC_BOOST)
-    set(BOOST_LINK "static")
-  elseif(USE_STATIC_BOOST)  
-    set(BOOST_LINK "shared,static")
-  endif(USE_STATIC_BOOST)
+  
   set(BOOST_LAYOUT tagged)
 
   set(BOOST_TOOLSET)
   set(BOOST_TOOLSET_BUILD)
 
+  if(USE_STATIC_BOOST)
+    set(BOOST_LINK "static")
+  elseif(USE_STATIC_BOOST)
+    set(BOOST_LINK "shared,static")
+  endif(USE_STATIC_BOOST)
+  
   if(MSVC12)
-  set(BOOST_TOOLSET_BUILD "toolset=msvc-12.0")
+    set(BOOST_TOOLSET_BUILD "toolset=msvc-12.0")
   elseif(MSVC14)
-  set(BOOST_TOOLSET_BUILD "toolset=msvc-14.0")
-  endif(MSVC12)	
+    set(BOOST_TOOLSET_BUILD "toolset=msvc-14.0")
+  endif(MSVC12)
 
   # Use the same compiler for building boost as for your own project
   if(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
@@ -115,11 +118,11 @@ if(NOT Boost_FOUND)
     set(BOOST_TOOLSET_BUILD "toolset=gcc")
     set(BOOST_CXX_FLAGS "-std=c++11")
   elseif(CMAKE_COMPILER_IS_GNUCXX)
-  # Determine the gcc version
+    # Determine the gcc version
     execute_process(COMMAND
-      ${CMAKE_CXX_COMPILER} -dumpversion
-      OUTPUT_VARIABLE
-      GCC_VERSION
+            ${CMAKE_CXX_COMPILER} -dumpversion
+            OUTPUT_VARIABLE
+            GCC_VERSION
     )
     set(BOOST_TOOLSET "gcc")
     set(BOOST_TOOLSET_BUILD "toolset=gcc-${GCC_VERSION}")
@@ -137,41 +140,40 @@ if(NOT Boost_FOUND)
   if(CMAKE_CL_64)
     set(BOOST_TOOLSET_ADDRESSMODEL "address-model=64")
   endif(CMAKE_CL_64)
-
+    
   ExternalProject_Add(boost
-    URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.tar.bz2
-    URL_MD5 ${Boost_MD5}
-    INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND 
-      ./bootstrap${SCRIPT_SUFFIX} --with-toolset=${BOOST_TOOLSET} --prefix=<INSTALL_DIR>
-    BUILD_COMMAND 
-      ./b2 install --prefix=<INSTALL_DIR>
-      ${BOOST_LIBRARIES}
-      -j8
-      --build-type=complete
-      variant=${BOOST_VARIANT}
-      link=${BOOST_LINK}
-      threading=${BOOST_THREADING}
-      --layout=${BOOST_LAYOUT}
-      ${BOOST_CXX_FLAGS}
-      ${BOOST_TOOLSET_BUILD}
-      ${BOOST_TOOLSET_ADDRESSMODEL}
-    BUILD_IN_SOURCE 1
-    INSTALL_COMMAND ""
+          URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.tar.bz2
+          URL_MD5 ${Boost_MD5}
+          INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+          UPDATE_COMMAND ""
+          CONFIGURE_COMMAND
+            ./bootstrap${SCRIPT_SUFFIX} --with-toolset=${BOOST_TOOLSET} --prefix=<INSTALL_DIR>
+          BUILD_COMMAND
+            ./b2 install --prefix=<INSTALL_DIR>
+            ${BOOST_LIBRARIES}
+            -j8
+            --build-type=complete
+            variant=${BOOST_VARIANT}
+            link=${BOOST_LINK}
+            threading=${BOOST_THREADING}
+            --layout=${BOOST_LAYOUT}
+            ${BOOST_CXX_FLAGS}
+            ${BOOST_TOOLSET_BUILD}
+            ${BOOST_TOOLSET_ADDRESSMODEL}
+            BUILD_IN_SOURCE 1
+            INSTALL_COMMAND ""
   )
 
   if(MSVC)
     string( REPLACE "_0" "" Boost_Version_Shorten ${Boost_Version_Underscore} )
     ExternalProject_Add_Step(boost MoveHeaders
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_CURRENT_SOURCE_DIR}/include/boost && ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}
-      DEPENDEES install
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_CURRENT_SOURCE_DIR}/include/boost
+            COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}
+            COMMENT "Move boost headers..."
+            DEPENDEES install
     )
-
-    set(Boost_USE_MULTITHREADED ON)
-    set(Boost_USE_STATIC_RUNTIME OFF)
   endif(MSVC)
-
+  
   if(MINGW)
     ExternalProject_Add_Step(boost FixBoostProjectConfig
             COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/fix_boost_project-config_for_mingw.bat <BINARY_DIR>
@@ -180,15 +182,14 @@ if(NOT Boost_FOUND)
             DEPENDEES configure
             DEPENDERS build
     )
-
+  endif(MINGW)
+  
+  if(WIN32)
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_RUNTIME OFF)
-  endif(MINGW)
-
-  if(USE_STATIC_BOOST)
-    set(Boost_USE_STATIC_LIBS ON)
-  endif(USE_STATIC_BOOST)
-
+  endif(WIN32)
+  
+  
   # set boost cmake variables such that only the ones from external are used
   ExternalProject_Get_Property(boost INSTALL_DIR)
   set(BOOST_ROOT ${INSTALL_DIR})
@@ -230,30 +231,30 @@ find_package(Cuke)
 
 if(NOT CUKE_FOUND)
   ExternalProject_Add(cucumber-cpp
-    INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
-    GIT_TAG gcc48
-    #  URL https://github.com/cucumber/cucumber-cpp/archive/v0.3.tar.gz
-    #  URL_MD5 c6498c974ddca7a87e07097d0172a1df
-    DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
-    CMAKE_ARGS
-      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-      -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-      -DCUKE_USE_STATIC_BOOST=${USE_STATIC_BOOST}
-      -DCUKE_DISABLE_BOOST_TEST=ON
-      -DCUKE_DISABLE_GTEST=OFF
-      -DCUKE_DISABLE_CPPSPEC=OFF
-      -DCUKE_DISABLE_FUNCTIONAL=ON
-      -DCUKE_ENABLE_EXAMPLES=OFF
-      -DBUILD_SHARED_LIBS=ON
-    BUILD_COMMAND 
-      cmake --build <BINARY_DIR> --target cucumber-cpp --config ${CMAKE_BUILD_TYPE}
-    UPDATE_COMMAND ""
-    INSTALL_COMMAND
-      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
-      ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}cucumber-cpp${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
+          INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+          GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
+          GIT_TAG gcc48
+  #  URL https://github.com/cucumber/cucumber-cpp/archive/v0.3.tar.gz
+  #  URL_MD5 c6498c974ddca7a87e07097d0172a1df
+          DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
+          CMAKE_ARGS
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
+            -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+            -DCUKE_USE_STATIC_BOOST=${USE_STATIC_BOOST}
+            -DCUKE_DISABLE_BOOST_TEST=ON
+            -DCUKE_DISABLE_GTEST=OFF
+            -DCUKE_DISABLE_CPPSPEC=ON
+            -DCUKE_DISABLE_FUNCTIONAL=ON
+            -DCUKE_ENABLE_EXAMPLES=OFF
+            -DBUILD_SHARED_LIBS=ON
+          BUILD_COMMAND
+            cmake --build <BINARY_DIR> --target cucumber-cpp --config ${CMAKE_BUILD_TYPE}
+          UPDATE_COMMAND ""
+          INSTALL_COMMAND
+            ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
+            ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}cucumber-cpp${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
   )
   add_dependencies(external_dependencies cucumber-cpp)
 endif(NOT CUKE_FOUND)

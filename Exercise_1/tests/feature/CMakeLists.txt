@@ -65,24 +65,12 @@ endif(CUKE_FOUND)
 #
 set(CORE_BOOST_LIBS thread system regex date_time chrono)
 
-find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
-
-#
-# Google Test driver
-#
-find_package(GTest REQUIRED)
-
-#
-# For using Googe Mock
-#
-find_package(GMock)
-
-# Find all feature files
-FILE(GLOB_RECURSE FEATURE_FILES features *.feature)
-
-source_group("Feature Files" FILES ${FEATURE_FILES})
-
 if(STEP_SOURCES)
+  # Find all feature files
+  FILE(GLOB_RECURSE FEATURE_FILES features *.feature)
+
+  source_group("Feature Files" FILES ${FEATURE_FILES})
+
   add_executable(features
           ${STEP_SOURCES}
           ${FEATURE_FILES}
@@ -90,6 +78,9 @@ if(STEP_SOURCES)
 
   add_executable(tests::features ALIAS features)
 
+  #
+  # Boost
+  #
   if(USE_STATIC_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
   else(USE_STATIC_BOOST)
@@ -98,61 +89,17 @@ if(STEP_SOURCES)
             BOOST_ALL_DYN_LINK
     )
   endif(USE_STATIC_BOOST)
-  
+
+  set(CORE_BOOST_LIBS thread system regex date_time chrono)
+
+  find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
+
   target_link_libraries(features
           ${CUKE_LIBRARIES}
           ${Boost_LIBRARIES}
   )
 
-  if(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(features
-            PRIVATE
-            -Wno-non-virtual-dtor
-            -Wno-global-constructors
-    )
-  endif(CMAKE_COMPILER_IS_CLANGCXX)
-
-  if(GTEST_FOUND)
-    target_include_directories(features
-            SYSTEM
-            PRIVATE
-            ${GTEST_INCLUDE_DIRS}
-    )
-    target_link_libraries(features
-            ${GTEST_LIBRARIES}
-    )
-  endif(GTEST_FOUND)
-
-  if(GMOCK_FOUND)
-    target_include_directories(features
-            SYSTEM
-            PRIVATE
-            ${GMOCK_INCLUDE_DIRS}
-    )
-    target_link_libraries(features
-            ${GMOCK_LIBRARIES}
-    )
-  endif(GMOCK_FOUND)
-
-  if(NOT WIN32)
-    find_library(PTREAD_LIB pthread REQUIRED)
-    target_link_libraries(features
-            ${PTREAD_LIB}
-    )
-  endif(NOT WIN32)
-
-  if(WIN32)
-    target_link_libraries(features
-            ws2_32
-    )
-  else(WIN32)
-    find_library(RT_LIB rt)
-    target_link_libraries(features
-            ${RT_LIB}
-    )
-  endif(WIN32)
-
-target_compile_features(features
+  target_compile_features(features
         PUBLIC
 #   cxx_aggregate_default_initializers
 #   cxx_alias_templates
@@ -211,9 +158,62 @@ target_compile_features(features
 #   cxx_variadic_macros
 #   cxx_variadic_templates
 #   cxx_template_template_parameters
-)
+  )
+  
+  if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(features
+            PRIVATE
+            -Wno-non-virtual-dtor
+            -Wno-global-constructors
+    )
+  endif(CMAKE_COMPILER_IS_CLANGCXX)
+  
+  #
+  # Google Test driver
+  #
+  find_package(GTest REQUIRED)
 
+  if(GTEST_FOUND)
+    target_include_directories(features
+            SYSTEM
+            PRIVATE
+            ${GTEST_INCLUDE_DIRS}
+    )
+    target_link_libraries(features
+            ${GTEST_LIBRARIES}
+    )
 
+    if(UNIX)
+      find_package(Threads) # GTest needs this and it's a static library
+      target_link_libraries(features
+          ${CMAKE_THREAD_LIBS_INIT}
+      )
+    endif(UNIX)
+  endif(GTEST_FOUND)
+
+  #
+  # For using Googe Mock
+  #
+  find_package(GMock)
+
+  
+  if(GMOCK_FOUND)
+    target_include_directories(features
+            SYSTEM
+            PRIVATE
+            ${GMOCK_INCLUDE_DIRS}
+    )
+    target_link_libraries(features
+            ${GMOCK_LIBRARIES}
+    )
+  endif(GMOCK_FOUND)
+
+  if(WIN32)
+    target_link_libraries(features
+            ws2_32
+    )
+  endif(WIN32)
+  
   if(WIN32)
     if(MSVC)
       set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/features.exe)
@@ -239,7 +239,7 @@ target_compile_features(features
     add_custom_target(run_feature_test
     # Run tests
             ${FEATURE_TEST_EXE_CMD}
-            COMMAND cucumber -P --tags ~@wip --tags ~@proposal --no-color -f pretty -s ${CMAKE_CURRENT_SOURCE_DIR}/features
+            COMMAND cucumber -P --tags ~@wip --tags ~@proposal --no-color -f pretty -s features
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Running cucumber."
     )
@@ -252,7 +252,7 @@ target_compile_features(features
     add_custom_target(run_wip_features
     # Run tests
             ${FEATURE_TEST_EXE_CMD}
-            COMMAND cucumber -P --tags @wip --wip --tags ~@proposal --no-color -f pretty -s ${CMAKE_CURRENT_SOURCE_DIR}/features
+            COMMAND cucumber -P --tags @wip --wip --tags ~@proposal --no-color -f pretty -s features
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Running cucumber (wip features)."
     )
@@ -275,7 +275,7 @@ target_compile_features(features
     )
   else(CUCUMBER_RUBY)
       message(WARNING "Could not find Cucumber: Install cucumber first in order to run tests")
-  endif(CUCUMBER_RUBY)
+  endif(CUCUMBER_RUBY)    
 
   #############################################
   # Create and run a feature test executable. #
@@ -288,11 +288,11 @@ target_compile_features(features
             EXCLUDE_FROM_ALL
             ${STEP_SOURCES}
     )
+
     target_link_libraries(features-cov
             ${CUKE_LIBRARIES}
             ${Boost_LIBRARIES}
-            ${PTREAD_LIB}
-            ${RT_LIB}
+            ${CMAKE_THREAD_LIBS_INIT}
     )
 
     if(CMAKE_COMPILER_IS_CLANGCXX)
