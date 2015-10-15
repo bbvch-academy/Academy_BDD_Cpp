@@ -102,7 +102,7 @@ if(NOT Boost_FOUND)
 
   if(USE_STATIC_BOOST)
     set(BOOST_LINK "static")
-  elseif(USE_STATIC_BOOST)
+  else(USE_STATIC_BOOST)
     set(BOOST_LINK "shared,static")
   endif(USE_STATIC_BOOST)
   
