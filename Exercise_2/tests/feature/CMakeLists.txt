@@ -90,7 +90,7 @@ if(STEP_SOURCES)
     )
   endif(USE_STATIC_BOOST)
 
-  set(CORE_BOOST_LIBS thread system regex date_time chrono)
+  set(CORE_BOOST_LIBS thread system regex date_time)
 
   find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 

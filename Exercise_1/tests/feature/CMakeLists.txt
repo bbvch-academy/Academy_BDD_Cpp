@@ -63,7 +63,7 @@ endif(CUKE_FOUND)
 #
 # Boost
 #
-set(CORE_BOOST_LIBS thread system regex date_time chrono)
+set(CORE_BOOST_LIBS thread system regex date_time)
 
 if(STEP_SOURCES)
   # Find all feature files
