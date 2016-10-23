@@ -15,7 +15,7 @@ MKDIR %BUILD_DIR%
 PUSHD %BUILD_DIR%
 @ECHO.
 @ECHO ======================================================================================
-@ECHO. 
+@ECHO.
 @ECHO -- Run cmake --
 @ECHO ----------------------
 IF %VISUAL_STUDIO%=="VS2015" (

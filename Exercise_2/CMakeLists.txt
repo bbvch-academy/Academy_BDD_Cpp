@@ -7,10 +7,39 @@ cmake_policy(SET CMP0048 NEW)
 
 # project name
 # TODO fill in your project name and version
-project(BDD_with_Cpp_Exercise_2)
+project(Cpp_project_template VERSION 1.2.0 LANGUAGES CXX C)
+
+# project name used in doxygen docu
+STRING(REGEX REPLACE "_" " " PROJECT_DOC_NAME ${PROJECT_NAME})
+
+# project name used for installation
+set(APPLICATION_NAME ${PROJECT_DOC_NAME})
+
+if (WIN32)
+  # Set a install path in the project folder
+  # Windows 7 can not install directly into the default folder (e.g. C:/Program Files (x86)/Cpp_Project_Template)
+  set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install CACHE PATH "Install path prefix" FORCE)
+endif (WIN32)
+
 
 # Cmake cache variables
 option(BUILD_EXTERNALS "Build also external libraries" TRUE)
+
+set(EXT_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/externals)
+set(EXT_INSTALL_INCLUDE_DIR ${EXT_INSTALL_DIR}/include)
+set(EXT_INSTALL_LIB_DIR ${EXT_INSTALL_DIR}/lib)
+
+set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+file(MAKE_DIRECTORY
+    ${EXT_INSTALL_DIR}
+    ${EXT_INSTALL_INCLUDE_DIR}
+    ${EXT_INSTALL_LIB_DIR}
+    ${RUNTIME_OUTPUT_DIRECTORY}
+    )
+
+set(CMAKE_INCLUDE_PATH ${EXT_INSTALL_INCLUDE_DIR})
+set(CMAKE_LIBRARY_PATH ${EXT_INSTALL_LIB_DIR})
 
 # set default built type to Debug
 if(NOT CMAKE_BUILD_TYPE)
@@ -31,14 +60,11 @@ endif()
 
 if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Xlinker '--no-as-needed'")
 endif(UNIX)
 
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-
-# set path to externals
-set(CMAKE_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/externals/include)
-set(CMAKE_LIBRARY_PATH ${PROJECT_SOURCE_DIR}/externals/lib)
 
 # external libraries
 if(BUILD_EXTERNALS)
@@ -46,9 +72,6 @@ if(BUILD_EXTERNALS)
 endif(BUILD_EXTERNALS)
 
 find_package(Boost)
-if(Boost_FOUND)
-    add_subdirectory(src)
-endif(Boost_FOUND)
 
 # unit tests require gmock
 find_package(GMock)
@@ -63,23 +86,3 @@ find_package(Cuke)
 if(CUKE_FOUND AND Boost_FOUND)
   add_subdirectory(tests/feature)
 endif(CUKE_FOUND AND Boost_FOUND)
- 
-# Add some custom target
-if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-  add_custom_target(coverage)
-endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-
-if(TARGET coverage_unittests)
-  add_dependencies(coverage coverage_unittests)
-endif(TARGET coverage_unittests)
-
-if(TARGET coverage_features)
-  add_dependencies(coverage coverage_features)
-endif(TARGET coverage_features)
-
-add_custom_target(remove_externals
-  ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/include
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/lib
-  COMMENT "Remove externals (lib & include)." VERBATIM
-)
-

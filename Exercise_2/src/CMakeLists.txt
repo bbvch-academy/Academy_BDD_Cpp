@@ -43,10 +43,8 @@ configure_file (
 
 #
 # Build library for internal use only (unittests)
-# TODO uncomment the EXCLUDE_FROM_ALL if your library is only used internally
-
 add_library(projectlib STATIC
-#  EXCLUDE_FROM_ALL
+  EXCLUDE_FROM_ALL
   ${PROJECTLIB_SOURCE_FILES}
   ${PROJECTLIB_HEADER_FILES}
 )
