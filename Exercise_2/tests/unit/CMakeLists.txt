@@ -18,9 +18,6 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
 if(NOT REPORT_DIR)
   set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
 endif(NOT REPORT_DIR)
-if(NOT COVERAGE_REPORT_DIR)
-  set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
-endif(NOT COVERAGE_REPORT_DIR)
 if(NOT TESTS_REPORT_DIR)
   set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
 endif(NOT TESTS_REPORT_DIR)
@@ -28,7 +25,6 @@ endif(NOT TESTS_REPORT_DIR)
 # create report and documentation output directories
 file(MAKE_DIRECTORY
     ${REPORT_DIR}
-    ${COVERAGE_REPORT_DIR}
     ${TESTS_REPORT_DIR}
 )
 
@@ -153,52 +149,3 @@ add_custom_target(run_unittests_xunit
 add_dependencies(run_unittests_xunit
     tests::unit
 )
-
-######################################
-# Create a single test executable.   #
-# With coverage measurement          #
-######################################
-if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-  include(CodeCoverage)
-  add_executable(unittests-cov
-      EXCLUDE_FROM_ALL
-      ${UNITTEST_SOURCES}
-      ${UNITTEST_HEADER_FILES}
-  )
-
-  set_target_properties(unittests-cov
-      PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
-  )
-
-  target_include_directories(unittests-cov
-      SYSTEM
-      PRIVATE
-      ${GTEST_INCLUDE_DIRS}
-  )
-
-  target_link_libraries(unittests-cov
-      ${GTEST_BOTH_LIBRARIES}
-      internal::projectlib-cov
-  )
-
-  if(GMOCK_FOUND)
-    target_link_libraries(unittests-cov
-        GMock::GMock
-        GMock::Main
-    )
-  endif(GMOCK_FOUND)
-
-  if(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(unittests-cov
-        PRIVATE
-        -Wno-global-constructors
-    )
-  endif(CMAKE_COMPILER_IS_CLANGCXX)
-
-  setup_target_for_coverage_cobertura(coverage_unittests
-      unittests-cov
-      ${COVERAGE_REPORT_DIR}/unittests
-      "--gtest_output='xml:${TESTS_REPORT_DIR}/unittests.xml'"
-  )
-endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
