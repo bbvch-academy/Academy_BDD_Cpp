@@ -15,7 +15,7 @@ _Das Ziel dieser Übung ist es von der Vision und den Business Goals ausgehend w
 
 ### Business Goal
 
-Mit der Lancierung unseres neuen Produktes wollen wir mit einem Marktanteil von mindestens 30 % zum Marktführer im Bereich Home Automation werden
+*Innerhalb des ersten Jahres nach der Lancierung unseres neuen Produktes wollen wir mit einem Marktanteil von mindestens 30 % zum Marktführer im Bereich Home Automation werden.*
 
 ## Aufgabe
 
