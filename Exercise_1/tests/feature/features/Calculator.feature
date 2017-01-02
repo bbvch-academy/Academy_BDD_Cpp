@@ -4,13 +4,12 @@ Feature: Cucumber-cpp Academy Exercise
   I want to implement all kind of cucumber steps without interaction to other code
   In order to learn how to define cucumber steps in C++
 
-@wip
+
 Scenario: Simple Steps
   Given the numbers 6 and 7
   When this numbers are multiplied
   Then the result should be 42
 
-@wip
 Scenario Outline: Examples
   Given the numbers <number 1> and <number 2>
   When this numbers are added
@@ -25,7 +24,6 @@ Examples:
   |   -20     |     25    |     5   |
   |  -100     |    -25    |   -125  |
 
-@wip
 Scenario: Input Table
   Given the following numbers:
     | number | 
@@ -42,7 +40,6 @@ Scenario: Input Table
     |    68  |
     |   200  |
 
-@wip
 Scenario: String Input
   Given the following text
     """
