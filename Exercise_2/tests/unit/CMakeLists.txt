@@ -10,6 +10,12 @@ function(register_test TEST_FILE)
         PRIVATE
         ${GTEST_INCLUDE_DIRS}
         )
+
+    target_include_directories(${TEST_NAME}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        )
+
     target_link_libraries(${TEST_NAME}
         ${GTEST_BOTH_LIBRARIES}
         internal::projectlib ${ARGN}
@@ -83,13 +89,21 @@ endif()
 
 # TODO add your header files here
 set(UNITTEST_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/heater_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/light_controller_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/light_fake.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/light_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/temperature_sensor_mock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/time_service_mock.h
     )
 
 source_group("Header Files" FILES ${UNITTEST_HEADER_FILES})
 
 # TODO add here all your tests (source file name without extension)
-register_test(src/dummy_test)
-register_test(src/gmock_test)
+register_test(src/heater_controller_test)
+register_test(src/home_automation_control_test)
+register_test(src/light_controller_test)
+register_test(src/light_scheduler_test)
 
 ######################################
 # Create a single test executable.   #
@@ -112,6 +126,11 @@ target_include_directories(unittests
     PRIVATE
     ${GTEST_INCLUDE_DIRS}
 )
+
+target_include_directories(unittests
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
 
 target_link_libraries(unittests
     ${GTEST_BOTH_LIBRARIES}

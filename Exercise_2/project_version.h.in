@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace CppTemplate
+namespace HomeAutomation
 {
 
   // the configured options and settings for the Project
@@ -11,7 +11,7 @@ namespace CppTemplate
   const auto version_minor = "@PROJECT_VERSION_MINOR@";
   const auto version_patch = "@PROJECT_VERSION_PATCH@";
 
-} // namespace CppTemplate
+}
 
 #endif // PROJECT_VERSION_H
 

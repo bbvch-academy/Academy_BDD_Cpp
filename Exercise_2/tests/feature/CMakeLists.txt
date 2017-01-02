@@ -74,14 +74,20 @@ endfunction()
 
 # TODO add your header files here
 set(FEATURETEST_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/features/step_definitions/fake_io.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/features/step_definitions/fake_temperature_sensor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/features/step_definitions/fake_time_service.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/features/step_definitions/home_automation_context.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/features/step_definitions/step_definition_helper_methods.h
     )
 
 source_group("Header Files" FILES ${FEATURETEST_HEADER_FILES})
 
 # TODO add all your step definition files here (source file without extension)
 if(CUKE_FOUND)
-  register_feature_steps(features/step_definitions/dummy_steps)
-  register_feature_steps(features/step_definitions/mock_steps)
+    register_feature_steps(features/step_definitions/heater_steps)
+    register_feature_steps(features/step_definitions/light_scheduler_steps)
+    register_feature_steps(features/step_definitions/light_switch_steps)
 endif(CUKE_FOUND)
 
 if(STEP_SOURCES)

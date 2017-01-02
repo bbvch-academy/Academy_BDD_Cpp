@@ -1,9 +1,7 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 #include "project_version.h"
-#include "dummy.h"
 
-using CppTemplate::Dummy;
 using boost::program_options::options_description;
 using boost::program_options::parse_command_line;
 
@@ -29,18 +27,13 @@ int main(int argc, char** argv)
     if (variable_map.count("version"))
     {
         std::cout << "version: "
-                  << CppTemplate::version_major
+                  << HomeAutomation::version_major
                   << "."
-                  << CppTemplate::version_minor
+                  << HomeAutomation::version_minor
                   << "."
-                  << CppTemplate::version_patch
+                  << HomeAutomation::version_patch
                   << std::endl;
         return 1;
     }
-
-
-  Dummy english_dummy{"Hello", "World"};
-  
-  std::cout << "A english dummy says: " << english_dummy.say_hello() << std::endl;
   return 0;
 }

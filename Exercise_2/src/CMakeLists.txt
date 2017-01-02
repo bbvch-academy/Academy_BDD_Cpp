@@ -3,12 +3,24 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 # TODO add your source files here
 set(PROJECTLIB_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/dummy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/heater_controller.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/home_automation_control.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/light_controller.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/light_scheduler.cpp
 )
 
 # TODO add your header files here
 set(PROJECTLIB_HEADER_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/../include/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/digital_io_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/heater_controller.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/home_automation_control.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/light_controller.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/light_scheduler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/scheduler_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/switch_control_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/temperature_control_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/temperature_sensor_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/time_service_interface.h
 )
 
 source_group("Header Files" FILES ${PROJECTLIB_HEADER_FILES})
@@ -41,6 +53,18 @@ configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/../include/project_version.h"
 )
 
+
+if(USE_STATIC_BOOST)
+  set(Boost_USE_STATIC_LIBS ON)
+else(USE_STATIC_BOOST)
+  target_compile_definitions(${PROJECT_NAME}
+      PRIVATE
+      BOOST_ALL_DYN_LINK
+      )
+endif(USE_STATIC_BOOST)
+
+find_package(Boost COMPONENTS date_time REQUIRED)
+
 #
 # Build library for internal use only (unittests)
 add_library(projectlib STATIC
@@ -50,6 +74,16 @@ add_library(projectlib STATIC
 )
 
 add_library(internal::projectlib ALIAS projectlib)
+
+target_include_directories(projectlib
+    SYSTEM PUBLIC
+    ${Boost_INCLUDE_DIRS}
+    )
+
+target_link_libraries(projectlib
+    INTERFACE
+    ${Boost_LIBRARIES}
+    )
 
 target_include_directories(projectlib
   PUBLIC
