@@ -175,84 +175,36 @@ endif(WIN32)
 
 #
 # Build main executable
+# with Boost
 #
-
-add_executable(${PROJECT_NAME}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-)
-add_executable(${PROJECT_NAME}::exe ALIAS ${PROJECT_NAME})
-
 if(USE_STATIC_BOOST)
   set(Boost_USE_STATIC_LIBS ON)
 else(USE_STATIC_BOOST)
   target_compile_definitions(${PROJECT_NAME}
-    PRIVATE
+      PRIVATE
       BOOST_ALL_DYN_LINK
-  )
+      )
 endif(USE_STATIC_BOOST)
 
-#
-# with Boost
-#
-find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(Boost COMPONENTS program_options)
 
-target_include_directories(${PROJECT_NAME}
-  SYSTEM
-  PUBLIC
-    ${Boost_INCLUDE_DIRS}
-)
+if(Boost_FOUND)
 
-target_link_libraries(${PROJECT_NAME}
-  ${Boost_LIBRARIES}
-  internal::projectlib
-)
-
-#
-# Build library with coverage support
-#
-
-if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-  add_library(projectlib-cov
-  EXCLUDE_FROM_ALL
-  ${PROJECTLIB_SOURCE_FILES}
-  ${PROJECTLIB_HEADER_FILES}
+  add_executable(${PROJECT_NAME}
+      ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   )
-  add_library(internal::projectlib-cov ALIAS projectlib-cov)
+  add_executable(${PROJECT_NAME}::exe ALIAS ${PROJECT_NAME})
 
-  target_compile_options(projectlib-cov
+  target_include_directories(${PROJECT_NAME}
+    SYSTEM
     PUBLIC
-      -fprofile-arcs
-      -ftest-coverage
-      -pedantic
-      -Wall
-      -Wextra
-    PRIVATE
-      -Werror
+      ${Boost_INCLUDE_DIRS}
   )
 
-  target_include_directories(projectlib-cov
-    PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/../include
+  target_link_libraries(${PROJECT_NAME}
+    ${Boost_LIBRARIES}
+    internal::projectlib
   )
+endif(Boost_FOUND)
 
-  target_compile_features(projectlib-cov
-    PUBLIC
-      cxx_auto_type
-      cxx_constexpr
-      cxx_defaulted_functions
-      cxx_defaulted_move_initializers
-      cxx_delegating_constructors
-      cxx_deleted_functions
-      cxx_final
-      cxx_lambdas
-      cxx_nullptr
-      cxx_override
-      cxx_range_for
-      cxx_rvalue_references
-      cxx_strong_enums
-  )
-
-  export(TARGETS projectlib projectlib-cov NAMESPACE internal:: FILE ${CMAKE_CURRENT_SOURCE_DIR}/../project-export.cmake)
-else(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-  export(TARGETS projectlib NAMESPACE internal:: FILE ${CMAKE_CURRENT_SOURCE_DIR}/../project-export.cmake)
-endif(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+export(TARGETS projectlib NAMESPACE internal:: FILE ${CMAKE_CURRENT_SOURCE_DIR}/../project-export.cmake)

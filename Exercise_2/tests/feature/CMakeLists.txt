@@ -72,6 +72,12 @@ function(register_feature_steps STEP_DEFINITION_FILE)
   set(STEP_SOURCES ${STEP_SOURCES} ${STEP_DEFINITION_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
+# TODO add your header files here
+set(FEATURETEST_HEADER_FILES
+    )
+
+source_group("Header Files" FILES ${FEATURETEST_HEADER_FILES})
+
 # TODO add all your step definition files here (source file without extension)
 if(CUKE_FOUND)
   register_feature_steps(features/step_definitions/dummy_steps)
@@ -86,6 +92,7 @@ if(STEP_SOURCES)
 
   add_executable(cucumber-cpp_wireserver
       ${STEP_SOURCES}
+      ${FEATURETEST_HEADER_FILES}
       ${FEATURE_FILES}
   )
   add_executable(feature::wireserver ALIAS cucumber-cpp_wireserver)
@@ -116,6 +123,11 @@ if(STEP_SOURCES)
       PRIVATE
       ${Boost_INCLUDE_DIRS}
   )
+
+  target_include_directories(cucumber-cpp_wireserver
+      PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/features/step_definitions
+      )
 
   target_link_libraries(cucumber-cpp_wireserver
       Cuke::Cucumber-cpp

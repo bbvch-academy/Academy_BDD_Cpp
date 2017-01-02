@@ -1,11 +1,37 @@
 # required minimum version of cmake
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-# TODO add your header files here
-set(UNITTEST_HEADER_FILES
-)
+function(register_test TEST_FILE)
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+    message(STATUS "Adding " ${TEST_NAME})
+    add_executable(${TEST_NAME} ${TEST_FILE}.cpp)
+    target_include_directories(${TEST_NAME}
+        SYSTEM
+        PRIVATE
+        ${GTEST_INCLUDE_DIRS}
+        )
+    target_link_libraries(${TEST_NAME}
+        ${GTEST_BOTH_LIBRARIES}
+        internal::projectlib ${ARGN}
+        )
 
-source_group("Header Files" FILES ${UNITTEST_HEADER_FILES})
+    if(GMOCK_FOUND)
+        target_link_libraries(${TEST_NAME}
+            GMock::GMock
+            GMock::Main
+            )
+    endif(GMOCK_FOUND)
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(${TEST_NAME}
+            PRIVATE
+            -Wno-global-constructors
+            )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
+
+    gtest_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+    set(UNITTEST_SOURCES ${UNITTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
+endfunction()
 
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
@@ -55,37 +81,11 @@ if(NOT TARGET internal::projectlib)
   include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
 endif()
 
-function(register_test TEST_FILE)
-  get_filename_component(TEST_NAME ${TEST_FILE} NAME)
-  message(STATUS "Adding " ${TEST_NAME})
-  add_executable(${TEST_NAME} ${TEST_FILE}.cpp)
-  target_include_directories(${TEST_NAME}
-      SYSTEM
-      PRIVATE
-      ${GTEST_INCLUDE_DIRS}
-  )
-  target_link_libraries(${TEST_NAME}
-      ${GTEST_BOTH_LIBRARIES}
-      internal::projectlib ${ARGN}
-  )
-
-  if(GMOCK_FOUND)
-    target_link_libraries(${TEST_NAME}
-        GMock::GMock
-        GMock::Main
+# TODO add your header files here
+set(UNITTEST_HEADER_FILES
     )
-  endif(GMOCK_FOUND)
 
-  if(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(${TEST_NAME}
-        PRIVATE
-        -Wno-global-constructors
-    )
-  endif(CMAKE_COMPILER_IS_CLANGCXX)
-
-  gtest_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
-  set(UNITTEST_SOURCES ${UNITTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
-endfunction()
+source_group("Header Files" FILES ${UNITTEST_HEADER_FILES})
 
 # TODO add here all your tests (source file name without extension)
 register_test(src/dummy_test)

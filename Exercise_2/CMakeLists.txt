@@ -72,11 +72,7 @@ if(BUILD_EXTERNALS)
 endif(BUILD_EXTERNALS)
 
 
-find_package(Boost)
-
-if(Boost_FOUND)
-  add_subdirectory(src)
-endif(Boost_FOUND)
+add_subdirectory(src)
 
 # unit tests require gmock
 find_package(GMock)
