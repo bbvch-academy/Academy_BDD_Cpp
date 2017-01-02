@@ -88,6 +88,6 @@ endif(GMOCK_FOUND)
 # feature tests require cucumber-cpp (aka cuke)
 find_package(Cuke)
 
-if(CUKE_FOUND AND Boost_FOUND)
+if(CUKE_FOUND)
   add_subdirectory(tests/feature)
-endif(CUKE_FOUND AND Boost_FOUND)
+endif(CUKE_FOUND)
