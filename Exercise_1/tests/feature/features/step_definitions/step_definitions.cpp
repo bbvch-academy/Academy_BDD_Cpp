@@ -32,13 +32,13 @@ using cucumber::ScenarioScope;
 
     }
 
-    GIVEN("^the following numbers:$") {
+    GIVEN("^the following numbers") {
         ScenarioScope<Context2> context;
         TABLE_PARAM(calculator_params);
-        const auto& number_table = calculator_params.hashes();
+        const auto& numbers = calculator_params.hashes();
 
-        for (const auto & table_row : number_table) {
-            context->numbers.push_back(std::stoi(table_row.at("number")));
+        for (const auto & number : numbers) {
+            context->numbers.push_back(std::stoi(number.at("number")));
         }
     }
 
