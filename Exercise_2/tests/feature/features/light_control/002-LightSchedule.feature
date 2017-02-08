@@ -48,13 +48,13 @@ Feature: Light Switch scheduler
       | 3     | ON    |
 
     When the time turns <time>
-    Then the light <light 1> should be "<state 1>"
-    And  the light <light 2> should be "<state 2>"
-    And  the light <light 3> should be "<state 3>"
-    And  the light <light 4> should be "<state 4>"
+    Then the light <light_1> should be "<state_1>"
+    And  the light <light_2> should be "<state_2>"
+    And  the light <light_3> should be "<state_3>"
+    And  the light <light_4> should be "<state_4>"
 
     Examples:
-      | time  | light 1 | state 1 | light 2 | state 2 | light 3 | state 3 | light 4 | state 4 |
+      | time  | light_1 | state_1 | light_2 | state_2 | light_3 | state_3 | light_4 | state_4 |
       | 08:59 | 0       | ON      | 1       | OFF     | 2       | ON      | 3       | ON      |
       | 09:00 | 0       | OFF     | 1       | ON      | 2       | ON      | 3       | ON      |
       | 09:01 | 0       | ON      | 1       | OFF     | 2       | ON      | 3       | ON      |

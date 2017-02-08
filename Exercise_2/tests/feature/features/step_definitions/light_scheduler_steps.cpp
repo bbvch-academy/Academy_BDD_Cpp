@@ -43,25 +43,25 @@ GIVEN ("^light (\\d+) is scheduled to turn \"(ON|OFF)\" at (\\d{2,2}):(\\d{2,2})
 }
 
 
-GIVEN ("^the following schedules are set:$")
+GIVEN ("^the following schedules are set")
 {
     TABLE_PARAM(schedule_params);
     ScenarioScope<HomeAutomationContext> context;
-    const table_hashes_type & schedule_param_table = schedule_params.hashes();
-    for (auto iter = schedule_param_table.begin(); iter != schedule_param_table.end(); ++iter)
+    const auto& schedules = schedule_params.hashes();
+    for (const auto& schedule : schedules)
     {
-        const TimeOfDay schedule = TimeOfDay::from_string(iter->at("schedule time"));
+        const TimeOfDay scheduled_time = TimeOfDay::from_string(schedule.at("schedule time"));
 
-        const uint32_t light_no = fromString<uint32_t>(iter->at("light"));
-        const std::string light_state = std::string(iter->at("state"));
+        const uint32_t light_no = fromString<uint32_t>(schedule.at("light"));
+        const std::string light_state = std::string(schedule.at("state"));
 
         if (state_bool(light_state))
         {
-            context->light_scheduler.schedule_turn_on(schedule, light_no);
+            context->light_scheduler.schedule_turn_on(scheduled_time, light_no);
         }
         else
         {
-            context->light_scheduler.schedule_turn_off(schedule, light_no);
+            context->light_scheduler.schedule_turn_off(scheduled_time, light_no);
         }
     }
 }

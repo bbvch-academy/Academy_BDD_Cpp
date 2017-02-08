@@ -324,7 +324,6 @@ if(NOT CUKE_FOUND)
     externalproject_add(cucumber-cpp
         INSTALL_DIR ${EXT_INSTALL_DIR}
         GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
-        GIT_TAG FindGMock
         #      URL https://github.com/cucumber/cucumber-cpp/archive/v${CUKE_VERSION}.tar.gz
         LOG_DOWNLOAD ON
         LOG_CONFIGURE ON

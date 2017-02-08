@@ -30,15 +30,15 @@ GIVEN ("^the light (\\d+) is \"(ON|OFF)\"$")
     ASSERT_EQ(expected_light_state, context->home_controller.light_state(light_no));
 }
 
-GIVEN ("^the following lights have state:$")
+GIVEN ("^the following lights have state")
 {
     TABLE_PARAM(light_params);
     ScenarioScope<HomeAutomationContext> context;
-    const table_hashes_type & light_param_table = light_params.hashes();
-    for (auto iter = light_param_table.begin(); iter != light_param_table.end(); ++iter)
+    const auto & lights = light_params.hashes();
+    for (const auto& light : lights)
     {
-        const uint32_t light_no = fromString<uint32_t>(iter->at("light"));
-        const std::string light_state = std::string(iter->at("state"));
+        const uint32_t light_no = fromString<uint32_t>(light.at("light"));
+        const std::string light_state = std::string(light.at("state"));
 
         context->light_controller.add_light(light_no, std::make_shared<FakeIO>());
 
@@ -67,15 +67,15 @@ THEN ("^the light (\\d+) should be \"(ON|OFF)\"$")
 }
 
 
-THEN ("^the lights should have the following states:$")
+THEN ("^the lights should have the following states")
 {
     ScenarioScope<HomeAutomationContext> context;
     TABLE_PARAM(light_params);
-    const table_hashes_type & light_param_table = light_params.hashes();
-    for (auto iter = light_param_table.begin(); iter != light_param_table.end(); ++iter)
+    const auto & lights = light_params.hashes();
+    for (const auto& light : lights)
     {
-        const uint32_t light_no = fromString<uint32_t>(iter->at("light"));
-        const std::string light_state = std::string(iter->at("state"));
+        const uint32_t light_no = fromString<uint32_t>(light.at("light"));
+        const std::string light_state = std::string(light.at("state"));
 
         const bool expected_light_state = state_bool(light_state);
         ASSERT_EQ(expected_light_state, context->home_controller.light_state(light_no));
